@@ -1,0 +1,13 @@
+{
+  "previewLink": "https://dedragames.com/games/ovo3/",
+  "appId": "com.dedra.ovoDimensions",
+  "appName": "OvO Dimensions",
+  "screenOrientations": ["landscape"],
+  "server": {
+    "allowNavigation": ["dedragames.com", "*.dedragames.com"]
+  },
+  "theme": {
+    "backgroundColor": "#000000",
+    "statusBarStyle": "dark"
+  }
+}

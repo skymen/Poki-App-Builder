@@ -1,8 +1,10 @@
 {
   "scripts": {
-    "build": "echo \"No build step defined\"",
+    "build": "node update-config.js",
+    "build:android": "npm run build && npx cap build android",
+    "build:ios": "npm run build && npx cap build ios",
     "cap:add": "npx cap add ios && npx cap add android",
-    "cap:sync": "npx cap sync",
+    "cap:sync": "npm run build && npx cap sync",
     "cap:open:ios": "npx cap open ios",
     "cap:open:android": "npx cap open android",
     "cap:run:ios": "npx cap run ios",

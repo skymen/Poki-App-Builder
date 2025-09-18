@@ -11,9 +11,9 @@ const config: CapacitorConfig = {
     androidScheme: 'https',
     iosScheme: 'capacitor',
     allowNavigation: [
-      'dedragames.com',
-      '*.dedragames.com'
-    ]
+      "dedragames.com",
+      "*.dedragames.com"
+]
   },
   
   android: {
@@ -42,7 +42,7 @@ const config: CapacitorConfig = {
     
     // Handle device orientation
     ScreenOrientation: {
-      orientation: ['landscape']
+      orientation: ["landscape"]
     },
     
     // For better performance
