@@ -12,6 +12,7 @@
     "ios:sync": "npm run build && npx cap sync ios",
     "ios:open": "npx cap open ios",
     "ios:run": "npm run build && npx cap run ios",
+    "ios:build:simulator": "npm run build && npx cap sync ios && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -sdk iphonesimulator -configuration Debug build",
     "cap:add": "npx cap add ios && npx cap add android",
     "cap:sync": "npm run build && npx cap sync",
     "cap:sync:test": "npm run build:test && npx cap sync",
