@@ -408,8 +408,20 @@ if (fs.existsSync(iosProjectPath)) {
     `PRODUCT_BUNDLE_IDENTIFIER = ${config.appId}`
   );
 
+  // Set code signing to manual for development (no team required)
+  iosProject = iosProject.replace(
+    /CODE_SIGN_STYLE = Automatic;/g,
+    'CODE_SIGN_STYLE = Manual;'
+  );
+  
+  // Set code sign identity to not sign for simulator builds
+  iosProject = iosProject.replace(
+    /CODE_SIGN_IDENTITY = "iPhone Developer";/g,
+    'CODE_SIGN_IDENTITY = "";'
+  );
+
   fs.writeFileSync(iosProjectPath, iosProject);
-  console.log("✅ Updated iOS bundle identifier");
+  console.log("✅ Updated iOS bundle identifier and signing configuration");
 }
 
 console.log("🎉 Configuration update complete!");
