@@ -52,6 +52,7 @@ When you run the build command, the following files are automatically updated:
 
    - `android/app/build.gradle` - Updates `namespace` and `applicationId`
    - `android/app/src/main/res/values/strings.xml` - Updates app name and package references
+   - `android/app/src/main/java/.../MainActivity.java` - Updates package name and moves to correct directory structure
 
 4. **iOS Files**:
    - `ios/App/App/Info.plist` - Updates `CFBundleDisplayName` and `CFBundleName`
