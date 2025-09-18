@@ -3,11 +3,24 @@
 const fs = require("fs");
 const path = require("path");
 
-// Read the app configuration
-const configPath = path.join(__dirname, "app.config.json");
-const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+// Get config file path from command line arguments or use default
+const args = process.argv.slice(2);
+const configFileName = args[0] || "app.config.json";
+const configPath = path.resolve(__dirname, configFileName);
 
+// Check if config file exists
+if (!fs.existsSync(configPath)) {
+  console.error(`❌ Config file not found: ${configPath}`);
+  console.error(`Usage: node update-config.js [config-file-path]`);
+  console.error(`Example: node update-config.js test-config.json`);
+  process.exit(1);
+}
+
+console.log(`🔧 Using config file: ${path.basename(configPath)}`);
 console.log("🔧 Updating app configuration...");
+
+// Read the app configuration
+const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
 // Update capacitor.config.ts
 const capacitorConfigPath = path.join(__dirname, "capacitor.config.ts");

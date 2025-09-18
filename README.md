@@ -24,10 +24,29 @@ Edit `app.config.json` to change your app settings:
 
 ## Available Scripts
 
+### Default Configuration (app.config.json)
+
 - `npm run build` - Updates configuration files based on app.config.json
 - `npm run build:android` - Builds for Android with updated config
+- `npm run build:android:debug` - Builds debug APK for Android
 - `npm run build:ios` - Builds for iOS with updated config
 - `npm run cap:sync` - Syncs Capacitor with updated config
+
+### Test Configuration (test-config.json)
+
+- `npm run build:test` - Updates configuration files using test-config.json
+- `npm run build:android:test` - Builds for Android using test configuration
+- `npm run build:android:debug:test` - Builds debug APK using test configuration
+- `npm run build:ios:test` - Builds for iOS using test configuration
+- `npm run cap:sync:test` - Syncs Capacitor using test configuration
+
+### Custom Configuration
+
+You can also use any config file directly:
+
+```bash
+node update-config.js your-custom-config.json
+```
 
 ## What Gets Updated
 
@@ -60,9 +79,31 @@ When you run the build command, the following files are automatically updated:
 
 ## Usage
 
+### Basic Usage
+
 1. Edit `app.config.json` with your desired settings
 2. Run `npm run build:android` or `npm run build:ios`
 3. Your app will be built with the updated configuration
+
+### Using Different Configurations
+
+1. **Test Configuration**: Use `npm run build:test` to build with `test-config.json`
+2. **Custom Configuration**: Run `node update-config.js my-config.json` with any config file
+3. **Multiple Apps**: Create different config files for different app variants
+
+### Examples
+
+```bash
+# Build with default config
+npm run build:android:debug
+
+# Build with test config
+npm run build:android:debug:test
+
+# Build with custom config
+node update-config.js my-game-config.json
+npm run cap:sync
+```
 
 ## Screen Orientations
 

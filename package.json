@@ -1,11 +1,17 @@
 {
   "scripts": {
     "build": "node update-config.js",
+    "build:config": "node update-config.js",
+    "build:test": "node update-config.js test-config.json",
     "build:android": "npm run build && JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home npx cap build android",
+    "build:android:test": "npm run build:test && JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home npx cap build android",
     "build:android:debug": "npm run build && JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home npx cap sync android && cd android && JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home ./gradlew assembleDebug",
+    "build:android:debug:test": "npm run build:test && JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home npx cap sync android && cd android && JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home ./gradlew assembleDebug",
     "build:ios": "npm run build && npx cap build ios",
+    "build:ios:test": "npm run build:test && npx cap build ios",
     "cap:add": "npx cap add ios && npx cap add android",
     "cap:sync": "npm run build && npx cap sync",
+    "cap:sync:test": "npm run build:test && npx cap sync",
     "cap:open:ios": "npx cap open ios",
     "cap:open:android": "npx cap open android",
     "cap:run:ios": "npx cap run ios",
