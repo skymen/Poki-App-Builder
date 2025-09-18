@@ -14,6 +14,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             configuration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
             configuration.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
+            
+            // Enable hardware acceleration and performance optimizations
+            configuration.allowsInlineMediaPlayback = true
+            configuration.allowsAirPlayForMediaPlayback = true
+            configuration.allowsPictureInPictureMediaPlayback = true
+            
+            // Enable caching and storage
+            configuration.websiteDataStore = WKWebsiteDataStore.default()
+            
+            // Performance optimizations
+            if #available(iOS 15.0, *) {
+                configuration.upgradeKnownHostsToHTTPS = false
+            }
         }
         
         return true

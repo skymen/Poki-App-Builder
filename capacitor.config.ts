@@ -27,20 +27,20 @@ const config: CapacitorConfig = {
     captureInput: true,
     webContentsDebuggingEnabled: true, // Remove in production
     loggingBehavior: 'debug', // Remove in production
-    // Disable security restrictions for iframe access
-    webSecurity: false,
-    allowUniversalAccessFromFileURLs: true,
-    allowFileAccessFromFileURLs: true
+    // Hardware acceleration and performance
+    appendUserAgent: 'CapacitorGame/1.0'
   },
   
   ios: {
     contentInset: 'never',
     scrollEnabled: false,
     allowsLinkPreview: false,
-    // Disable security restrictions for iframe access
-    webSecurity: false,
-    allowUniversalAccessFromFileURLs: true,
-    allowFileAccessFromFileURLs: true
+    // Performance optimizations
+    preferredContentMode: 'mobile',
+    // Enable hardware acceleration
+    allowsInlineMediaPlayback: true,
+    // Caching and performance
+    limitsNavigationsToAppBoundDomains: false
   },
   
   plugins: {

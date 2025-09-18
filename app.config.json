@@ -4,7 +4,12 @@
   "appName": "OvO Dimensions",
   "screenOrientations": ["landscape"],
   "server": {
-    "allowNavigation": ["dedragames.com", "*.dedragames.com", "poki-gdn.com", "*.poki-gdn.com"]
+    "allowNavigation": [
+      "dedragames.com",
+      "*.dedragames.com",
+      "poki-gdn.com",
+      "*.poki-gdn.com"
+    ]
   },
   "theme": {
     "backgroundColor": "#000000",
