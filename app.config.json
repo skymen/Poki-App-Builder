@@ -1,10 +1,10 @@
 {
-  "previewLink": "https://dedragames.com/games/ovo3/",
+  "previewLink": "https://eb0dd73c-4471-4d4e-8b5c-cbbf351119ac.poki-gdn.com/bcba3a23-0a4d-4fc7-8677-1baaa32da402/index.html?country=FR&ccpaApplies=0&url_referrer=https%3A%2F%2Fdedragames.com%2F&game_id=eb0dd73c-4471-4d4e-8b5c-cbbf351119ac&game_version_id=bcba3a23-0a4d-4fc7-8677-1baaa32da402&inspector=0",
   "appId": "com.dedra.ovoDimensions",
   "appName": "OvO Dimensions",
   "screenOrientations": ["landscape"],
   "server": {
-    "allowNavigation": ["dedragames.com", "*.dedragames.com"]
+    "allowNavigation": ["dedragames.com", "*.dedragames.com", "poki-gdn.com", "*.poki-gdn.com"]
   },
   "theme": {
     "backgroundColor": "#000000",

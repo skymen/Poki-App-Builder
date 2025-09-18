@@ -74,7 +74,7 @@
       </div>
       <iframe
         id="game-frame"
-        src="https://dedragames.com/games/ovo3/"
+        src="https://eb0dd73c-4471-4d4e-8b5c-cbbf351119ac.poki-gdn.com/bcba3a23-0a4d-4fc7-8677-1baaa32da402/index.html?country=FR&ccpaApplies=0&url_referrer=https%3A%2F%2Fdedragames.com%2F&game_id=eb0dd73c-4471-4d4e-8b5c-cbbf351119ac&game_version_id=bcba3a23-0a4d-4fc7-8677-1baaa32da402&inspector=0"
         allow="accelerometer; gyroscope; gamepad; fullscreen; autoplay; encrypted-media"
         allowfullscreen
         style="display: none"
@@ -91,6 +91,31 @@
         gameFrame.addEventListener("load", function () {
           loading.style.display = "none";
           gameFrame.style.display = "block";
+          
+          // Try to hide footer (now directly accessible since no nested iframe)
+          try {
+            const iframeDoc = gameFrame.contentDocument || gameFrame.contentWindow.document;
+            const footer = iframeDoc.getElementById("footer");
+            if (footer) {
+              footer.style.display = "none";
+              console.log("Footer hidden successfully");
+            } else {
+              console.log("Footer element not found");
+            }
+          } catch (error) {
+            console.log("Cannot access iframe content due to cross-origin restrictions:", error.message);
+            
+            // Alternative approach: send postMessage to iframe
+            try {
+              gameFrame.contentWindow.postMessage({
+                type: "hideFooter",
+                code: 'document.getElementById("footer").style.display = "none"'
+              }, "*");
+              console.log("Sent postMessage to hide footer");
+            } catch (postError) {
+              console.log("PostMessage also failed:", postError.message);
+            }
+          }
         });
 
         // Handle frame errors

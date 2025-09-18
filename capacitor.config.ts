@@ -12,21 +12,35 @@ const config: CapacitorConfig = {
     iosScheme: 'capacitor',
     allowNavigation: [
       "dedragames.com",
-      "*.dedragames.com"
-]
+      "*.dedragames.com",
+      "poki-gdn.com",
+      "*.poki-gdn.com"
+],
+    // Disable additional security restrictions
+    cleartext: true,
+    allowMixedContent: true,
+    errorPath: '/error.html'
   },
   
   android: {
     allowMixedContent: true,
     captureInput: true,
     webContentsDebuggingEnabled: true, // Remove in production
-    loggingBehavior: 'debug' // Remove in production
+    loggingBehavior: 'debug', // Remove in production
+    // Disable security restrictions for iframe access
+    webSecurity: false,
+    allowUniversalAccessFromFileURLs: true,
+    allowFileAccessFromFileURLs: true
   },
   
   ios: {
     contentInset: 'never',
     scrollEnabled: false,
-    allowsLinkPreview: false
+    allowsLinkPreview: false,
+    // Disable security restrictions for iframe access
+    webSecurity: false,
+    allowUniversalAccessFromFileURLs: true,
+    allowFileAccessFromFileURLs: true
   },
   
   plugins: {

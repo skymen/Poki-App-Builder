@@ -36,20 +36,32 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https',
     iosScheme: 'capacitor',
-    allowNavigation: ${JSON.stringify(config.server.allowNavigation, null, 6)}
+    allowNavigation: ${JSON.stringify(config.server.allowNavigation, null, 6)},
+    // Disable additional security restrictions
+    cleartext: true,
+    allowMixedContent: true,
+    errorPath: '/error.html'
   },
   
   android: {
     allowMixedContent: true,
     captureInput: true,
     webContentsDebuggingEnabled: true, // Remove in production
-    loggingBehavior: 'debug' // Remove in production
+    loggingBehavior: 'debug', // Remove in production
+    // Disable security restrictions for iframe access
+    webSecurity: false,
+    allowUniversalAccessFromFileURLs: true,
+    allowFileAccessFromFileURLs: true
   },
   
   ios: {
     contentInset: 'never',
     scrollEnabled: false,
-    allowsLinkPreview: false
+    allowsLinkPreview: false,
+    // Disable security restrictions for iframe access
+    webSecurity: false,
+    allowUniversalAccessFromFileURLs: true,
+    allowFileAccessFromFileURLs: true
   },
   
   plugins: {
@@ -190,6 +202,31 @@ const indexTemplate = `<!-- index.html - Your main wrapper page -->
         gameFrame.addEventListener("load", function () {
           loading.style.display = "none";
           gameFrame.style.display = "block";
+          
+          // Try to hide footer (now directly accessible since no nested iframe)
+          try {
+            const iframeDoc = gameFrame.contentDocument || gameFrame.contentWindow.document;
+            const footer = iframeDoc.getElementById("footer");
+            if (footer) {
+              footer.style.display = "none";
+              console.log("Footer hidden successfully");
+            } else {
+              console.log("Footer element not found");
+            }
+          } catch (error) {
+            console.log("Cannot access iframe content due to cross-origin restrictions:", error.message);
+            
+            // Alternative approach: send postMessage to iframe
+            try {
+              gameFrame.contentWindow.postMessage({
+                type: "hideFooter",
+                code: 'document.getElementById("footer").style.display = "none"'
+              }, "*");
+              console.log("Sent postMessage to hide footer");
+            } catch (postError) {
+              console.log("PostMessage also failed:", postError.message);
+            }
+          }
         });
 
         // Handle frame errors
@@ -327,9 +364,28 @@ if (fs.existsSync(androidBuildGradlePath)) {
     // Update MainActivity.java content
     const mainActivityTemplate = `package ${config.appId};
 
+import android.os.Bundle;
+import android.webkit.WebView;
 import com.getcapacitor.BridgeActivity;
 
-public class MainActivity extends BridgeActivity {}
+public class MainActivity extends BridgeActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        // Disable WebView security restrictions to allow iframe access
+        WebView webView = getBridge().getWebView();
+        webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
+        webView.getSettings().setAllowFileAccessFromFileURLs(true);
+        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setAllowContentAccess(true);
+        webView.getSettings().setAllowFileAccess(true);
+        
+        // Disable web security (equivalent to --disable-web-security in Chrome)
+        webView.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+    }
+}
 `;
 
     const newMainActivityPath = path.join(newPackageDir, "MainActivity.java");
@@ -362,6 +418,53 @@ public class MainActivity extends BridgeActivity {}
   } else {
     console.log("⚠️  MainActivity.java not found");
   }
+
+  // Update Android AndroidManifest.xml for orientation
+  const androidManifestPath = path.join(
+    __dirname,
+    "android",
+    "app",
+    "src",
+    "main",
+    "AndroidManifest.xml"
+  );
+  if (fs.existsSync(androidManifestPath)) {
+    let androidManifest = fs.readFileSync(androidManifestPath, "utf8");
+
+    // Determine Android orientation value based on config
+    let androidOrientation = "unspecified";
+    if (
+      config.screenOrientations.includes("landscape") &&
+      !config.screenOrientations.includes("portrait")
+    ) {
+      androidOrientation = "landscape";
+    } else if (
+      config.screenOrientations.includes("portrait") &&
+      !config.screenOrientations.includes("landscape")
+    ) {
+      androidOrientation = "portrait";
+    }
+
+    // Update MainActivity orientation
+    if (androidOrientation !== "unspecified") {
+      // Check if orientation is already specified
+      if (androidManifest.includes("android:screenOrientation=")) {
+        androidManifest = androidManifest.replace(
+          /android:screenOrientation="[^"]*"/g,
+          `android:screenOrientation="${androidOrientation}"`
+        );
+      } else {
+        // Add orientation attribute to MainActivity
+        androidManifest = androidManifest.replace(
+          /(<activity[^>]*android:name="\.MainActivity"[^>]*)/,
+          `$1\n            android:screenOrientation="${androidOrientation}"`
+        );
+      }
+      console.log(`✅ Updated Android orientation to ${androidOrientation}`);
+    }
+
+    fs.writeFileSync(androidManifestPath, androidManifest);
+  }
 }
 
 // Update iOS configuration
@@ -385,6 +488,37 @@ if (fs.existsSync(iosInfoPlistPath)) {
   iosInfoPlist = iosInfoPlist.replace(
     /<key>CFBundleName<\/key>\s*<string>[^<]*<\/string>/g,
     `<key>CFBundleName</key>\n\t<string>${config.appName}</string>`
+  );
+
+  // Update supported interface orientations based on config
+  let iosOrientations = [];
+  if (config.screenOrientations.includes("landscape")) {
+    iosOrientations.push("UIInterfaceOrientationLandscapeLeft");
+    iosOrientations.push("UIInterfaceOrientationLandscapeRight");
+  }
+  if (config.screenOrientations.includes("portrait")) {
+    iosOrientations.push("UIInterfaceOrientationPortrait");
+    iosOrientations.push("UIInterfaceOrientationPortraitUpsideDown");
+  }
+
+  // Build orientation arrays for iPhone and iPad
+  const orientationArrayiPhone = iosOrientations
+    .map((o) => `\t\t<string>${o}</string>`)
+    .join("\n");
+  const orientationArrayiPad = iosOrientations
+    .map((o) => `\t\t<string>${o}</string>`)
+    .join("\n");
+
+  // Update UISupportedInterfaceOrientations (iPhone)
+  iosInfoPlist = iosInfoPlist.replace(
+    /<key>UISupportedInterfaceOrientations<\/key>\s*<array>[\s\S]*?<\/array>/,
+    `<key>UISupportedInterfaceOrientations</key>\n\t<array>\n${orientationArrayiPhone}\n\t</array>`
+  );
+
+  // Update UISupportedInterfaceOrientations~ipad (iPad)
+  iosInfoPlist = iosInfoPlist.replace(
+    /<key>UISupportedInterfaceOrientations~ipad<\/key>\s*<array>[\s\S]*?<\/array>/,
+    `<key>UISupportedInterfaceOrientations~ipad</key>\n\t<array>\n${orientationArrayiPad}\n\t</array>`
   );
 
   fs.writeFileSync(iosInfoPlistPath, iosInfoPlist);
