@@ -221,6 +221,184 @@ if (!fs.existsSync(distDir)) {
 fs.writeFileSync(indexPath, indexTemplate);
 console.log("✅ Updated dist/index.html");
 
+// Update Android configuration
+const androidBuildGradlePath = path.join(
+  __dirname,
+  "android",
+  "app",
+  "build.gradle"
+);
+if (fs.existsSync(androidBuildGradlePath)) {
+  console.log("🤖 Updating Android configuration...");
+
+  let androidBuildGradle = fs.readFileSync(androidBuildGradlePath, "utf8");
+
+  // Update namespace and applicationId
+  androidBuildGradle = androidBuildGradle.replace(
+    /namespace\s+"[^"]*"/g,
+    `namespace "${config.appId}"`
+  );
+  androidBuildGradle = androidBuildGradle.replace(
+    /applicationId\s+"[^"]*"/g,
+    `applicationId "${config.appId}"`
+  );
+
+  fs.writeFileSync(androidBuildGradlePath, androidBuildGradle);
+  console.log("✅ Updated Android build.gradle");
+
+  // Update Android strings.xml
+  const androidStringsPath = path.join(
+    __dirname,
+    "android",
+    "app",
+    "src",
+    "main",
+    "res",
+    "values",
+    "strings.xml"
+  );
+  if (fs.existsSync(androidStringsPath)) {
+    const androidStringsTemplate = `<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">${config.appName}</string>
+    <string name="title_activity_main">${config.appName}</string>
+    <string name="package_name">${config.appId}</string>
+    <string name="custom_url_scheme">${config.appId}</string>
+</resources>
+`;
+    fs.writeFileSync(androidStringsPath, androidStringsTemplate);
+    console.log("✅ Updated Android strings.xml");
+  }
+
+  // Update MainActivity.java package name and handle directory structure
+  const oldPackagePath = config.appId.replace(/\./g, "/");
+  const mainActivityPath = path.join(
+    __dirname,
+    "android",
+    "app",
+    "src",
+    "main",
+    "java",
+    oldPackagePath,
+    "MainActivity.java"
+  );
+
+  // First, try to find MainActivity.java in any existing package structure
+  const javaDir = path.join(__dirname, "android", "app", "src", "main", "java");
+  let foundMainActivity = null;
+
+  function findMainActivity(dir) {
+    if (!fs.existsSync(dir)) return null;
+    const items = fs.readdirSync(dir);
+    for (const item of items) {
+      const itemPath = path.join(dir, item);
+      if (fs.statSync(itemPath).isDirectory()) {
+        const result = findMainActivity(itemPath);
+        if (result) return result;
+      } else if (item === "MainActivity.java") {
+        return itemPath;
+      }
+    }
+    return null;
+  }
+
+  foundMainActivity = findMainActivity(javaDir);
+
+  if (foundMainActivity) {
+    // Create new directory structure
+    const newPackageDir = path.join(javaDir, oldPackagePath);
+    if (!fs.existsSync(newPackageDir)) {
+      fs.mkdirSync(newPackageDir, { recursive: true });
+    }
+
+    // Update MainActivity.java content
+    const mainActivityTemplate = `package ${config.appId};
+
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {}
+`;
+
+    const newMainActivityPath = path.join(newPackageDir, "MainActivity.java");
+    fs.writeFileSync(newMainActivityPath, mainActivityTemplate);
+
+    // Remove old MainActivity.java if it's in a different location
+    if (foundMainActivity !== newMainActivityPath) {
+      fs.unlinkSync(foundMainActivity);
+      console.log(
+        `✅ Moved MainActivity.java from ${foundMainActivity} to ${newMainActivityPath}`
+      );
+
+      // Clean up empty directories
+      let oldDir = path.dirname(foundMainActivity);
+      while (oldDir !== javaDir) {
+        try {
+          if (fs.readdirSync(oldDir).length === 0) {
+            fs.rmdirSync(oldDir);
+            oldDir = path.dirname(oldDir);
+          } else {
+            break;
+          }
+        } catch (e) {
+          break;
+        }
+      }
+    } else {
+      console.log("✅ Updated MainActivity.java package name");
+    }
+  } else {
+    console.log("⚠️  MainActivity.java not found");
+  }
+}
+
+// Update iOS configuration
+const iosInfoPlistPath = path.join(
+  __dirname,
+  "ios",
+  "App",
+  "App",
+  "Info.plist"
+);
+if (fs.existsSync(iosInfoPlistPath)) {
+  console.log("🍎 Updating iOS configuration...");
+
+  let iosInfoPlist = fs.readFileSync(iosInfoPlistPath, "utf8");
+
+  // Update CFBundleDisplayName and CFBundleName
+  iosInfoPlist = iosInfoPlist.replace(
+    /<key>CFBundleDisplayName<\/key>\s*<string>[^<]*<\/string>/g,
+    `<key>CFBundleDisplayName</key>\n\t<string>${config.appName}</string>`
+  );
+  iosInfoPlist = iosInfoPlist.replace(
+    /<key>CFBundleName<\/key>\s*<string>[^<]*<\/string>/g,
+    `<key>CFBundleName</key>\n\t<string>${config.appName}</string>`
+  );
+
+  fs.writeFileSync(iosInfoPlistPath, iosInfoPlist);
+  console.log("✅ Updated iOS Info.plist");
+}
+
+// Update iOS project.pbxproj (bundle identifier)
+const iosProjectPath = path.join(
+  __dirname,
+  "ios",
+  "App",
+  "App.xcodeproj",
+  "project.pbxproj"
+);
+if (fs.existsSync(iosProjectPath)) {
+  let iosProject = fs.readFileSync(iosProjectPath, "utf8");
+
+  // Update PRODUCT_BUNDLE_IDENTIFIER
+  iosProject = iosProject.replace(
+    /PRODUCT_BUNDLE_IDENTIFIER = [^;]*/g,
+    `PRODUCT_BUNDLE_IDENTIFIER = ${config.appId}`
+  );
+
+  fs.writeFileSync(iosProjectPath, iosProject);
+  console.log("✅ Updated iOS bundle identifier");
+}
+
 console.log("🎉 Configuration update complete!");
 console.log(`📱 App: ${config.appName} (${config.appId})`);
 console.log(`🔗 Preview: ${config.previewLink}`);

@@ -1,0 +1,13 @@
+{
+  "previewLink": "https://dedragames.com/games/ovo3/",
+  "appId": "com.test.myawesomegame",
+  "appName": "My Awesome Game",
+  "screenOrientations": ["portrait", "landscape"],
+  "server": {
+    "allowNavigation": ["dedragames.com", "*.dedragames.com", "example.com"]
+  },
+  "theme": {
+    "backgroundColor": "#2c3e50",
+    "statusBarStyle": "light"
+  }
+}
