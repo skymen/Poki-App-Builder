@@ -411,9 +411,9 @@ if (fs.existsSync(iosProjectPath)) {
   // Set code signing to manual for development (no team required)
   iosProject = iosProject.replace(
     /CODE_SIGN_STYLE = Automatic;/g,
-    'CODE_SIGN_STYLE = Manual;'
+    "CODE_SIGN_STYLE = Manual;"
   );
-  
+
   // Set code sign identity to not sign for simulator builds
   iosProject = iosProject.replace(
     /CODE_SIGN_IDENTITY = "iPhone Developer";/g,

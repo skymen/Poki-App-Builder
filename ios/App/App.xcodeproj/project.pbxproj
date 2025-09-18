@@ -128,7 +128,7 @@
 					504EC3031FED79650016851F = {
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 1100;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -391,7 +391,7 @@
 				504EC3151FED79650016851F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		504EC3161FED79650016851F /* Build configuration list for PBXNativeTarget "App" */ = {
 			isa = XCConfigurationList;
@@ -400,7 +400,7 @@
 				504EC3181FED79650016851F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
